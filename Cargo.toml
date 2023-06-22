@@ -1,0 +1,13 @@
+[package]
+name = "afraid"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+confy = "0.5.1"
+dialoguer = "0.10.4"
+serde = { version = "1.0.164", features = ["derive"] }
+serde-xml-rs = "0.6.0"
+sha1 = "0.10.5"
+twink = "0.1.1"
+ureq = "2.7.1"
