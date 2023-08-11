@@ -9,5 +9,5 @@ dialoguer = "0.10.4"
 serde = { version = "1.0.164", features = ["derive"] }
 serde-xml-rs = "0.6.0"
 sha1 = "0.10.5"
-twink = "0.1.1"
+twink = { version = "1.0.0", features = ["12-hour"] }
 ureq = "2.7.1"

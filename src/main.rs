@@ -24,7 +24,7 @@ const SLEEP_MINUTES: u64 = 5;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut ip = get_ip()?;
-    twink::info!("Your IP is: {}", ip);
+    twink::mrrr!("Your IP is: {}", ip);
 
     if !confy::get_configuration_file_path("afraid", "afraid")?.exists() {
         let username = Input::with_theme(&ColorfulTheme::default())
@@ -42,25 +42,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let cfg = confy::load::<Config>("afraid", "afraid")?;
-    twink::info!("Logged in as: {}", cfg.username);
+    twink::purr!("Logged in as: {}", cfg.username);
 
     let api = format!(
         "https://freedns.afraid.org/api/?action=getdyndns&v=2&sha={}&style=xml",
         cfg.hash
     );
 
-    twink::info!("Found domains:-");
+    twink::mrrr!("Found domains:-");
     for domain in get_domains(&api)? {
-        twink::info!("{} | {}", domain.host, domain.address);
+        twink::mrrr!("{} | {}", domain.host, domain.address);
     }
 
     loop {
         ip = update_ip(&ip)?;
         for domain in get_domains(&api)? {
             if ip != domain.address {
-                twink::info!("Updating {}: {} -> {}", domain.host, domain.address, ip);
-                let res = ureq::get(&domain.url).call()?.into_string()?;
-                twink::info!("{res}");
+                twink::mrrr!("Updating {}: {} -> {}", domain.host, domain.address, ip);
+                twink::purr!("{}", ureq::get(&domain.url).call()?.into_string()?);
             }
         }
 
@@ -73,9 +72,9 @@ fn get_ip() -> Result<String, Box<dyn std::error::Error>> {
 }
 
 fn update_ip(old_ip: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let new_ip = ureq::get("http://ipinfo.io/ip").call()?.into_string()?;
+    let new_ip = get_ip()?;
     if old_ip != new_ip {
-        twink::info!("IP changed: {old_ip} -> {new_ip}, updating domains...");
+        twink::mrrr!("IP changed: {} -> {}, updating domains...", old_ip, new_ip);
     }
     Ok(new_ip)
 }
