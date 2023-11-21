@@ -6,6 +6,7 @@ use sha1::{Digest, Sha1};
 struct Config {
     username: String,
     hash: String,
+    blacklist: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -38,7 +39,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         hasher.update(secret.as_bytes());
         let hash = format!("{:x}", hasher.finalize());
 
-        confy::store("afraid", "afraid", Config { username, hash })?;
+        confy::store(
+            "afraid",
+            "afraid",
+            Config {
+                username,
+                hash,
+                blacklist: vec![],
+            },
+        )?;
     }
 
     let cfg = confy::load::<Config>("afraid", "afraid")?;
@@ -49,17 +58,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         cfg.hash
     );
 
-    twink::mrrr!("Found domains:-");
-    for domain in get_domains(&api)? {
-        twink::mrrr!("{} | {}", domain.host, domain.address);
+    twink::mrrr!("Found domains:");
+    for domain in get_domains(&cfg, &api)? {
+        twink::purr!("{} | {}", domain.host, domain.address);
     }
 
     loop {
         ip = update_ip(&ip)?;
-        for domain in get_domains(&api)? {
+        for domain in get_domains(&cfg, &api)? {
             if ip != domain.address {
                 twink::mrrr!("Updating {}: {} -> {}", domain.host, domain.address, ip);
-                twink::purr!("{}", ureq::get(&domain.url).call()?.into_string()?);
+                let res = ureq::get(&domain.url).call()?;
+                twink::purr!("{}", res.into_string()?)
             }
         }
 
@@ -79,7 +89,13 @@ fn update_ip(old_ip: &str) -> Result<String, Box<dyn std::error::Error>> {
     Ok(new_ip)
 }
 
-fn get_domains(api: &str) -> Result<Vec<Item>, Box<dyn std::error::Error>> {
+fn get_domains(cfg: &Config, api: &str) -> Result<Vec<Item>, Box<dyn std::error::Error>> {
     let xml = ureq::get(api).call()?.into_string()?;
-    Ok(serde_xml_rs::from_str::<Afraid>(&xml)?.item)
+    let blaclist = &cfg.blacklist;
+    let domains = serde_xml_rs::from_str::<Afraid>(&xml)?
+        .item
+        .into_iter()
+        .filter(|domain| !blaclist.contains(&domain.host))
+        .collect();
+    Ok(domains)
 }

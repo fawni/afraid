@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 confy = "0.5.1"
-dialoguer = "0.10.4"
-serde = { version = "1.0.164", features = ["derive"] }
+dialoguer = "0.11.0"
+serde = { version = "1.0.193", features = ["derive"] }
 serde-xml-rs = "0.6.0"
-sha1 = "0.10.5"
-twink = { version = "1.0.0", features = ["12-hour"] }
-ureq = "2.7.1"
+sha1 = "0.10.6"
+twink = { version = "1.1.2", features = ["12-hour"] }
+ureq = "2.9.0"
