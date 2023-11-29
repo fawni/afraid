@@ -91,11 +91,11 @@ fn update_ip(old_ip: &str) -> Result<String, Box<dyn std::error::Error>> {
 
 fn get_domains(cfg: &Config, api: &str) -> Result<Vec<Item>, Box<dyn std::error::Error>> {
     let xml = ureq::get(api).call()?.into_string()?;
-    let blaclist = &cfg.blacklist;
+    let blacklist = &cfg.blacklist;
     let domains = serde_xml_rs::from_str::<Afraid>(&xml)?
         .item
         .into_iter()
-        .filter(|domain| !blaclist.contains(&domain.host))
+        .filter(|domain| !blacklist.contains(&domain.host))
         .collect();
     Ok(domains)
 }
